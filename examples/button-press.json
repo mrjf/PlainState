@@ -1,0 +1,96 @@
+{
+  "initial": "Idle",
+  "unhandled": "ignore",
+  "states": [
+    {
+      "name": "Idle",
+      "description": "No gesture is in progress."
+    },
+    {
+      "name": "Pressed",
+      "description": "One gesture is in progress."
+    }
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "begin",
+      "guards": [
+        {
+          "name": "interactive",
+          "negated": false
+        }
+      ],
+      "to": "Pressed",
+      "actions": [],
+      "emits": [],
+      "effects": [],
+      "present": "press"
+    },
+    {
+      "from": "Idle",
+      "event": "activate",
+      "guards": [
+        {
+          "name": "interactive",
+          "negated": false
+        }
+      ],
+      "to": "Idle",
+      "actions": [],
+      "emits": [
+        {
+          "event": "activated",
+          "payload": "an empty payload"
+        }
+      ],
+      "effects": [],
+      "present": "activation"
+    },
+    {
+      "from": "Pressed",
+      "event": "release",
+      "guards": [
+        {
+          "name": "interactive",
+          "negated": false
+        }
+      ],
+      "to": "Idle",
+      "actions": [],
+      "emits": [
+        {
+          "event": "activated",
+          "payload": "an empty payload"
+        }
+      ],
+      "effects": [],
+      "present": "activation"
+    },
+    {
+      "from": "Pressed",
+      "event": "release",
+      "guards": [
+        {
+          "name": "interactive",
+          "negated": true
+        }
+      ],
+      "to": "Idle",
+      "actions": [],
+      "emits": [],
+      "effects": [],
+      "present": "cancel"
+    },
+    {
+      "from": "Pressed",
+      "event": "cancel",
+      "guards": [],
+      "to": "Idle",
+      "actions": [],
+      "emits": [],
+      "effects": [],
+      "present": "cancel"
+    }
+  ]
+}

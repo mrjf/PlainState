@@ -1,0 +1,19 @@
+***plainstate***
+
+- Starts in :Idle:.
+- Unhandled events leave state unchanged and emit nothing.
+
+- :Idle: No gesture is in progress.
+  - On begin, when interactive, go to :Pressed:.
+    - Present press.
+  - On activate, when interactive, stay.
+    - Emit activated with an empty payload.
+    - Present activation.
+- :Pressed: One gesture is in progress.
+  - On release, when interactive, go to :Idle:.
+    - Emit activated with an empty payload.
+    - Present activation.
+  - On release, when not interactive, go to :Idle:.
+    - Present cancel.
+  - On cancel, go to :Idle:.
+    - Present cancel.
