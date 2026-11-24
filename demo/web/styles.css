@@ -313,9 +313,18 @@ button.quiet:hover { color: var(--shell-ink); }
 }
 .trace-item.ignored { color: var(--muted); }
 
-.t-header { color: var(--t-header); font-weight: 500; }
-.t-bullet { color: var(--t-bullet); }
-.t-concept { color: var(--t-concept); font-weight: 500; }
-.t-keyword { color: var(--t-keyword); }
-.t-event { color: var(--t-event); font-weight: 500; }
-.t-desc { color: var(--t-desc); }
+.reader {
+  font: 14.5px/1.65 var(--sans);
+  white-space: normal;
+  padding: 18px 20px;
+}
+.pv-row { padding-left: calc(var(--depth, 0) * 20px); margin: 2px 0; }
+.pv-definition { margin-top: 12px; font-size: 15px; }
+.pv-definition:first-child { margin-top: 0; }
+.pv-name { color: var(--ink); font-weight: 600; }
+.pv-ref { color: var(--t-concept); font-weight: 600; }
+.pv-bullet { color: var(--muted); margin-right: 8px; }
+.pv-sep { color: var(--muted); }
+.pv-desc { color: var(--t-desc); }
+.pv-event { font-family: var(--mono); font-size: 13px; color: var(--t-event); font-weight: 500; }
+.pv-keyword { color: var(--t-keyword); }

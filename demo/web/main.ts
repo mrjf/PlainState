@@ -69,7 +69,7 @@ const EXAMPLES: Record<string, string> = {
 };
 
 const plainInput = document.getElementById("plain-input") as HTMLTextAreaElement;
-const formattedView = document.getElementById("formatted-view") as HTMLPreElement;
+const formattedView = document.getElementById("formatted-view") as HTMLDivElement;
 const jsonView = document.getElementById("json-view") as HTMLPreElement;
 const exampleSelect = document.getElementById("example-select") as HTMLSelectElement;
 const statusEl = document.getElementById("status") as HTMLDivElement;
@@ -96,19 +96,42 @@ function escapeHtml(text: string): string {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function highlightPlainState(source: string): string {
-  return source
-    .split("\n")
-    .map((line) => {
-      if (line === "***plainstate***") {
-        return `<span class="t-header">${escapeHtml(line)}</span>`;
-      }
-      return escapeHtml(line)
-        .replace(/^(\s*- )/, '<span class="t-bullet">$1</span>')
-        .replace(/:([A-Za-z][A-Za-z0-9_-]*):/g, '<span class="t-concept">:$1:</span>')
-        .replace(/\b(Starts in|Unhandled events|On|when|not|and|go to|stay|Do|Emit|with|Request|Present)\b/g, '<span class="t-keyword">$1</span>');
-    })
-    .join("\n");
+function renderInline(text: string): string {
+  return escapeHtml(text).replace(
+    /:([A-Za-z][A-Za-z0-9_-]*):/g,
+    '<strong class="pv-ref">$1</strong>',
+  );
+}
+
+function renderReader(source: string): string {
+  const rows: string[] = [];
+  for (const line of source.split("\n")) {
+    if (line.trim() === "" || /^\*\*\*[^*]+\*\*\*$/.test(line.trim())) continue;
+    const indent = line.length - line.trimStart().length;
+    const depth = Math.floor(indent / 2);
+    if (!line.startsWith("- ", indent)) continue;
+    const body = line.slice(indent + 2);
+
+    const stateDecl = /^:([A-Za-z][A-Za-z0-9_-]*):(?:\s+(.*))?$/.exec(body);
+    if (stateDecl) {
+      const desc = stateDecl[2]?.trim()
+        ? `<span class="pv-sep"> — </span><span class="pv-desc">${renderInline(stateDecl[2].trim())}</span>`
+        : "";
+      rows.push(`<div class="pv-row pv-definition" style="--depth:${depth}"><strong class="pv-name">${escapeHtml(stateDecl[1]!)}</strong>${desc}</div>`);
+      continue;
+    }
+
+    const edge = /^(On\s+)([A-Za-z][A-Za-z0-9_-]*)(.*)$/.exec(body);
+    if (edge) {
+      rows.push(
+        `<div class="pv-row pv-edge" style="--depth:${depth}"><span class="pv-bullet">→</span><span class="pv-keyword">${escapeHtml(edge[1]!)}</span><span class="pv-event">${escapeHtml(edge[2]!)}</span>${renderInline(edge[3]!)}</div>`,
+      );
+      continue;
+    }
+
+    rows.push(`<div class="pv-row pv-directive" style="--depth:${depth}"><span class="pv-bullet">·</span>${renderInline(body)}</div>`);
+  }
+  return rows.join("");
 }
 
 function renderSimulator(): void {
@@ -198,7 +221,7 @@ function compile(): void {
     }
     currentMachine = machine;
 
-    formattedView.innerHTML = highlightPlainState(canonical);
+    formattedView.innerHTML = renderReader(canonical);
     jsonView.textContent = json + "\n";
 
     const warn = analysis.unreachableStates.length
