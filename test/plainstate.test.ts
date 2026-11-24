@@ -2,6 +2,8 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
   analyzeMachine,
+  applyTokens,
+  extractTokens,
   formatPlainState,
   fromJsonMachine,
   parsePlainState,
@@ -107,5 +109,21 @@ describe("PlainState", () => {
 `),
       /Unknown target state/i,
     );
+  });
+
+  it("extracts and applies {{token}} templates before parsing", () => {
+    const tpl = `***plainstate***
+- Starts in :Idle:.
+- Unhandled events leave state unchanged and emit nothing.
+- :Idle: Ready.
+  - On press, when {{guard}}, go to :Active:.
+    - Present {{cue}}.
+- :Active: Active.
+`;
+    assert.deepEqual(extractTokens(tpl), ["guard", "cue"]);
+    const applied = applyTokens(tpl, { guard: "interactive", cue: "press" });
+    assert.deepEqual(applied.missing, []);
+    const machine = parsePlainState(applied.text);
+    assert.equal(machine.transitions[0]?.present, "press");
   });
 });

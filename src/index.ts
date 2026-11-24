@@ -1,4 +1,11 @@
 export {
+  applyTokens,
+  extractTokens,
+  type AppliedTemplate,
+  type TokenSpan,
+} from "./template.js";
+
+export {
   analyzeMachine,
   formatPlainState,
   formatPlainStateText,
