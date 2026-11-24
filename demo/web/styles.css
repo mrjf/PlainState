@@ -328,3 +328,30 @@ button.quiet:hover { color: var(--shell-ink); }
 .pv-desc { color: var(--t-desc); }
 .pv-event { font-family: var(--mono); font-size: 13px; color: var(--t-event); font-weight: 500; }
 .pv-keyword { color: var(--t-keyword); }
+.tokens-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--rule);
+  background: var(--surface-2);
+  flex: none;
+}
+.token-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 12px var(--mono);
+  color: var(--muted);
+}
+.token-field input {
+  width: 100px;
+  height: 24px;
+  padding: 0 7px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  font: 12px var(--mono);
+}

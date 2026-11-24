@@ -1,5 +1,7 @@
 import {
   analyzeMachine,
+  applyTokens,
+  extractTokens,
   formatPlainState,
   parsePlainState,
   stepMachine,
@@ -70,6 +72,34 @@ const EXAMPLES: Record<string, string> = {
 
 const plainInput = document.getElementById("plain-input") as HTMLTextAreaElement;
 const formattedView = document.getElementById("formatted-view") as HTMLDivElement;
+const tokensBar = document.getElementById("tokens-bar") as HTMLDivElement;
+const tokenValues: Record<string, string> = {};
+
+function renderTokensBar(tokens: string[]): void {
+  tokensBar.hidden = tokens.length === 0;
+  const existing = Array.from(tokensBar.querySelectorAll<HTMLInputElement>("input[data-token]")).map(
+    (el) => el.dataset.token!,
+  );
+  if (existing.join(",") === tokens.join(",")) return;
+  tokensBar.innerHTML = "";
+  for (const token of tokens) {
+    const label = document.createElement("label");
+    label.className = "token-field";
+    const span = document.createElement("span");
+    span.textContent = `{{${token}}}`;
+    const input = document.createElement("input");
+    input.dataset.token = token;
+    input.value = tokenValues[token] ?? "";
+    input.placeholder = "value";
+    input.addEventListener("input", () => {
+      if (input.value === "") delete tokenValues[token];
+      else tokenValues[token] = input.value;
+      compile();
+    });
+    label.append(span, input);
+    tokensBar.appendChild(label);
+  }
+}
 const jsonView = document.getElementById("json-view") as HTMLPreElement;
 const exampleSelect = document.getElementById("example-select") as HTMLSelectElement;
 const statusEl = document.getElementById("status") as HTMLDivElement;
@@ -209,7 +239,10 @@ function renderSimulator(): void {
 
 function compile(): void {
   try {
-    const machine = parsePlainState(plainInput.value);
+    const tokens = extractTokens(plainInput.value);
+    renderTokensBar(tokens);
+    const applied = applyTokens(plainInput.value, tokenValues);
+    const machine = parsePlainState(applied.text);
     const canonical = formatPlainState(machine);
     const analysis = analyzeMachine(machine);
     const json = JSON.stringify(machine, null, 2);
